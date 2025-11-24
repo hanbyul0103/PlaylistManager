@@ -1,0 +1,24 @@
+{
+  "name": "playlistmanager",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/hanbyul0103/PlaylistManager#readme",
+  "bugs": {
+    "url": "https://github.com/hanbyul0103/PlaylistManager/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hanbyul0103/PlaylistManager.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.25.1",
+    "dotenv": "^17.2.3"
+  }
+}
