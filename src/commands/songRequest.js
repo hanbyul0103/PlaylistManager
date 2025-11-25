@@ -62,11 +62,7 @@ export default {
             return;
         };
 
-        const today = new Date();
-        const month = today.getMonth() + 1;
-        const date = today.getDate();
-
-        const filePath = path.join(dataPath, `${month}-${date}.json`);
+        const filePath = path.join(dataPath, `requests_current.json`);
 
         let songData = {};
 
@@ -78,32 +74,34 @@ export default {
 
         const newSongData = {
             artist: artist,
-            title: title,
-            day: [
-                day
-            ]
+            title: title
         };
 
-        songData[userId] = newSongData;
+        songData[day][userId] = newSongData;
 
         jsonHelper.writeFile(filePath, songData);
 
         let songList = [];
+        let values = [];
+
         songData = jsonHelper.readFile(filePath);
 
-        for (const song of Object.entries(songData)) {
-            if (song.day === day) {
-                songList.push({
-                    name: `${day} 신청 목록`,
-                    value: `${song.artist} - ${song.title}`,
-                    inline: false
-                });
+        for (const [dayKey, userRequests] of Object.entries(songData)) {
+            if (dayKey === day) {
+                for (const [userId, song] of Object.entries(userRequests)) {
+                    songList.push({
+                        name: `\u200b`,
+                        value: `${song.artist} - ${song.title}\n`,
+                        inline: false
+                    })
+                }
             }
         }
+        //values.push(`${song.artist} - ${song.title}\n`);
 
         const requestEmbed = embedGenerator.createEmbed(
             {
-                title: `${day} 노래 신청`,
+                title: `${day} 노래 신청 목록`,
                 description: `규칙에 어긋난 신청곡은 예고 없이 삭제될 수 있습니다.`,
                 fields: songList,
                 timestamp: true
