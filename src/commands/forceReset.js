@@ -5,7 +5,6 @@ import { fileURLToPath } from 'url';
 
 // 외부 함수
 import * as jsonHelper from "../utils/jsonHelper.js";
-import { json } from 'stream/consumers';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

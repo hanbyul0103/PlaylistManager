@@ -69,7 +69,6 @@ export default {
         // .txt 파일 생성하는 부분
         let fileContent = '';
 
-
         if (day && !songData[day]) {
             await interaction.editReply({ content: `해당 요일의 플레이리스트가 없습니다.` });
 

@@ -69,11 +69,18 @@ export default {
         for (const [dayKey, userRequests] of Object.entries(songData)) {
             if (day && dayKey !== day) continue;
 
+            const dayRequests = songData[day];
+            const currentSongCount = Object.keys(dayRequests).length;
+
             const requestEntries = Object.entries(userRequests);
 
-            if (requestEntries.length === 0) continue; // 리스트가 없다고 출력하기
-
             let songsContent = '';
+
+            if (currentSongCount === 0) {
+                songsContent += `등록된 노래가 없습니다.\n`;
+
+                continue;
+            }
 
             for (const [currentUserId, song] of requestEntries) {
                 if (user && currentUserId !== user.id) continue;

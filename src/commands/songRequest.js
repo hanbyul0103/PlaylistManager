@@ -85,7 +85,7 @@ export default {
         const dayRequests = songData[day];
         const currentSongCount = Object.keys(dayRequests).length;
 
-        if (currentSongCount >= 12) { // TODO: 최대 신청곡 수
+        if (currentSongCount >= process.env.MAX_SONGS) {
             await interaction.editReply({ content: `${day} 플레이리스트는 이미 꽉 차서 신청할 수 없습니다.` });
 
             return;
