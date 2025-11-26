@@ -1,6 +1,5 @@
 import {
     ApplicationCommandOptionType,
-    ContainerBuilder,
 } from 'discord.js';
 
 // 라이브러리
@@ -68,17 +67,15 @@ export default {
         let songList = [];
 
         for (const [dayKey, userRequests] of Object.entries(songData)) {
-
             if (day && dayKey !== day) continue;
 
             const requestEntries = Object.entries(userRequests);
+
             if (requestEntries.length === 0) continue; // 리스트가 없다고 출력하기
 
             let songsContent = '';
 
             for (const [currentUserId, song] of requestEntries) {
-
-                // 4. 유저를 지정했다면 해당 유저의 곡만 포함합니다.
                 if (user && currentUserId !== user.id) continue;
 
                 songsContent += `${song.artist} - ${song.title}\n`;
