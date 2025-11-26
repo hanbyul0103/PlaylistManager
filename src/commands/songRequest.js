@@ -15,7 +15,7 @@ const __dirname = path.dirname(__filename);
 
 export default {
     name: 'request-song',
-    description: '노래 신청',
+    description: '원하는 요일에 노래를 신청할 수 있습니다.',
     options: [
         {
             name: 'artist',

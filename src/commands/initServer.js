@@ -15,7 +15,7 @@ const __dirname = path.dirname(__filename);
 
 export default {
     name: 'init-server',
-    description: '서버를 DB에 등록합니다.',
+    description: '현재 서버를 DB에 등록합니다.',
     callback: async (client, interaction) => {
         await interaction.deferReply({ ephemeral: true });
 
