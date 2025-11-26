@@ -40,6 +40,8 @@ export default {
             fs.copyFileSync(oldFilePath, newFilePath);
 
         jsonHelper.createNewDataFile(oldFilePath);
+
+        await interaction.editReply({ content: `현재 리스트가 아카이브로 백업되었으며, 새로운 주차 신청이 시작되었습니다.` });
     },
 };
 
