@@ -1,11 +1,9 @@
 import {
     ApplicationCommandOptionType,
-    PermissionsBitField,
 } from 'discord.js';
 
 // 라이브러리
 import path from 'path';
-import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 // 외부 함수
@@ -46,7 +44,7 @@ export default {
         },
     ],
     callback: async (client, interaction) => {
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply({ ephemeral: false });
 
         const artist = interaction.options?.getString('artist');
         const title = interaction.options?.getString('title');
@@ -68,8 +66,6 @@ export default {
 
         if (jsonHelper.isFileExist(filePath)) {
             songData = jsonHelper.readFile(filePath);
-
-            console.log(songData);
         }
 
         const newSongData = {
@@ -77,27 +73,32 @@ export default {
             title: title
         };
 
+        if(!songData[day]) {
+            songData[day] = {};
+        }
+
         songData[day][userId] = newSongData;
 
         jsonHelper.writeFile(filePath, songData);
 
         let songList = [];
-        let values = [];
-
-        songData = jsonHelper.readFile(filePath);
+        songData = jsonHelper.readFile(filePath); // 저장 후 다시 가져오는 부분 (최신으로)
 
         for (const [dayKey, userRequests] of Object.entries(songData)) {
             if (dayKey === day) {
+                let songs = '';
+
                 for (const [userId, song] of Object.entries(userRequests)) {
-                    songList.push({
-                        name: `\u200b`,
-                        value: `${song.artist} - ${song.title}\n`,
-                        inline: false
-                    })
+                    songs += `${song.artist} - ${song.title}\n`;
                 }
+
+                songList.push({
+                    name: `${dayKey}`,
+                    value: songs,
+                    inline: false
+                });
             }
         }
-        //values.push(`${song.artist} - ${song.title}\n`);
 
         const requestEmbed = embedGenerator.createEmbed(
             {
