@@ -52,7 +52,7 @@ export default {
         const userId = interaction.user.id;
 
         //#region 서버 json 파일 불러오는 파트
-        
+
         const guildId = interaction.guild.id;
         const dataPath = path.join(__dirname, `../data/${guildId}`);
 
@@ -77,7 +77,7 @@ export default {
             title: title
         };
 
-        if(!songData[day]) {
+        if (!songData[day]) {
             songData[day] = {};
         }
 
