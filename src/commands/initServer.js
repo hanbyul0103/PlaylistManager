@@ -21,7 +21,7 @@ export default {
 
         const member = interaction.member;
         if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-            await interaction.editReply({ content: `관리자 권한이 필요합니다.` });
+            await interaction.editReply({ content: `서버를 DB에 등록하기 위해서는 관리자 권한이 필요합니다.` });
 
             return;
         }
