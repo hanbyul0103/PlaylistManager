@@ -1,5 +1,4 @@
 // 외부 함수
-import * as jsonHelper from "../utils/jsonHelper.js";
 import * as commandRegister from "../utils/commandRegister.js";
 import * as loadCommands from "../utils/loadCommands.js";
 
