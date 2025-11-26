@@ -35,15 +35,7 @@ export default {
             const filePath = path.join(dataPath, `requests_current.json`);
 
             if (!jsonHelper.isFileExist(filePath)) {
-                let originData = {};
-
-                const dayofweek = ['월요일', '화요일', '수요일', '목요일', '금요일'];
-
-                for (let i = 0; i < dayofweek.length; ++i) {
-                    originData[dayofweek[i]] = {};
-                }
-
-                jsonHelper.writeFile(filePath, originData);
+                jsonHelper.createNewDataFile(filePath);
             }
 
             await interaction.editReply({ content: `서버를 DB 등록했습니다.` });
