@@ -41,8 +41,19 @@ export default {
     callback: async (client, interaction) => {
         await interaction.deferReply({ ephemeral: false });
 
-        const day = interaction.options?.getString('day');
         const user = interaction.options?.getUser('user');
+
+        if (user) {
+            const member = interaction.member;
+
+            if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+                await interaction.editReply({ content: `특정 유저의 신청 목록을 제거하기 위해서는 관리자 권한이 필요합니다.` });
+
+                return;
+            }
+        }
+
+        const day = interaction.options?.getString('day');
 
         let userId = user ? user.id : interaction.user.id;
 
@@ -56,16 +67,6 @@ export default {
 
             return;
         };
-
-        if (user) {
-            const member = interaction.member;
-
-            if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-                await interaction.editReply({ content: `특정 유저의 신청 목록을 제거하기 위해서는 관리자 권한이 필요합니다.` });
-
-                return;
-            }
-        }
 
         const filePath = path.join(dataPath, `requests_current.json`);
 
@@ -105,7 +106,7 @@ export default {
         }
 
         let description = '';
-        
+
         if (!dayRequests[userId]) {
             description = `해당 유저의 신청 목록이 없어 제거되지 않았습니다.`;
         } else {
