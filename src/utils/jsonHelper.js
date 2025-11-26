@@ -37,4 +37,16 @@ function writeFile(filePath, data) {
     }
 }
 
-export { isFileExist, readFile, writeFile };
+function createNewDataFile(filePath) {
+    let originData = {};
+
+    const dayofweek = ['월요일', '화요일', '수요일', '목요일', '금요일'];
+
+    for (let i = 0; i < dayofweek.length; ++i) {
+        originData[dayofweek[i]] = {};
+    }
+
+    writeFile(filePath, originData);
+}
+
+export { isFileExist, readFile, writeFile, createNewDataFile };
