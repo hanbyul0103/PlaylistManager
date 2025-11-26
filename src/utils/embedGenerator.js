@@ -6,15 +6,17 @@ function createEmbed({ title, description, fields = [], timestamp = false }) {
     if (title)
         embed.setTitle(title);
 
-    if(description)
+    if (description)
         embed.setDescription(description);
 
     if (fields.length > 0) {
-        embed.addFields(fields.map(f => ({
-            name: f.name,
-            value: `${f.value}\n`,
-            inline: f.inline || false
-        })));
+        embed.addFields(
+            fields.map(f => ({
+                name: f.name,
+                value: `${f.value}\n`,
+                inline: f.inline || false
+            }))
+        );
     }
 
     if (timestamp) {
