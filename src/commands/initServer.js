@@ -17,7 +17,7 @@ export default {
     name: 'init-server',
     description: '현재 서버를 DB에 등록합니다.',
     callback: async (client, interaction) => {
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply({ ephemeral: false });
 
         const member = interaction.member;
         if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) {

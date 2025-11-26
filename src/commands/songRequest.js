@@ -51,6 +51,8 @@ export default {
         const day = interaction.options?.getString('day');
         const userId = interaction.user.id;
 
+        //#region 서버 json 파일 불러오는 파트
+        
         const guildId = interaction.guild.id;
         const dataPath = path.join(__dirname, `../data/${guildId}`);
 
@@ -61,6 +63,8 @@ export default {
         };
 
         const filePath = path.join(dataPath, `requests_current.json`);
+
+        //#endregion
 
         let songData = {};
 
