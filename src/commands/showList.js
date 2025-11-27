@@ -69,18 +69,19 @@ export default {
         for (const [dayKey, userRequests] of Object.entries(songData)) {
             if (day && dayKey !== day) continue;
 
-            const dayRequests = songData[day];
-            const currentSongCount = Object.keys(dayRequests).length;
-
-            const requestEntries = Object.entries(userRequests);
+            const currentSongCount = Object.keys(userRequests || {}).length;
 
             let songsContent = '';
 
             if (currentSongCount === 0) {
-                songsContent += `등록된 노래가 없습니다.\n`;
+                if (day) {
+                    songsContent += `등록된 노래가 없습니다.\n`;
+                }
 
                 continue;
             }
+
+            const requestEntries = Object.entries(userRequests);
 
             for (const [currentUserId, song] of requestEntries) {
                 if (user && currentUserId !== user.id) continue;
@@ -104,14 +105,17 @@ export default {
             description += `<@${user.id}>의 `;
         if (day)
             description += `**${day}** `
-        if ((user || day) !== null)
+
+        if (user || day)
             description += "신청 목록입니다.";
+        else if (songList.length === 0)
+            description = "현재 등록된 노래 신청 목록이 없습니다.";
 
         const listEmbed = embedGenerator.createEmbed(
             {
                 title: `${title}`,
                 description: `${description}`,
-                fields: songList,
+                fields: songList.length > 0 ? songList : [{ name: "정보 없음", value: "조회된 신청 목록이 없습니다." }],
                 timestamp: true
             }
         )
