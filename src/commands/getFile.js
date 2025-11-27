@@ -36,14 +36,14 @@ export default {
         await interaction.deferReply({ ephemeral: false });
 
         const member = interaction.member;
-        if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-            await interaction.editReply({ content: `해당 명령어를 실행하기 위해서는 관리자 권한이 필요합니다.` });
+        
+        if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) { // TODO: 관리자 권한 > 지정한 역할이 있는지 확인
+            await interaction.editReply({ content: `해당 명령어는 특정 역할이 있는 유저만 실행할 수 있습니다.` });
 
             return;
         }
 
         const day = interaction.options?.getString('day');
-        const userId = interaction.user.id;
 
         //#region 서버 json 파일 불러오는 파트
 
