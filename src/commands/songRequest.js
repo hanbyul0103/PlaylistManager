@@ -85,13 +85,23 @@ export default {
         const dayRequests = songData[day];
         const currentSongCount = Object.keys(dayRequests).length;
 
+        // if() // TODO: 본인이 주에 2개 했는지 확인
+
         if (currentSongCount >= process.env.MAX_SONGS) {
             await interaction.editReply({ content: `${day} 플레이리스트는 이미 꽉 차서 신청할 수 없습니다.` });
 
             return;
         }
 
+        if (getUserCount(songData, userId) >= process.env.MAX_REQUESTS_PER_USER) {
+            await interaction.editReply({ content: `한 주에 최대 ${MAX_REQUESTS_PER_USER}곡까지 신청할 수 있습니다. 이미 ${MAX_REQUESTS_PER_USER}곡을 신청했습니다.` });
+
+            return;
+        }
+
         songData[day][userId] = newSongData;
+
+        setUserCount(songData, userId, getUserCount(songData, userId) + 1);
 
         jsonHelper.writeFile(filePath, songData);
 
@@ -99,6 +109,8 @@ export default {
         songData = jsonHelper.readFile(filePath); // 저장 후 다시 가져오는 부분 (최신으로)
 
         for (const [dayKey, userRequests] of Object.entries(songData)) {
+            if (dayKey === "requests" || dayKey === "unionRole") continue;
+
             if (dayKey === day) {
                 let songs = '';
 
@@ -108,7 +120,7 @@ export default {
 
                 songList.push({
                     name: `${dayKey}`,
-                    value: songs,
+                    value: songs || `등록된 노래가 없습니다.`,
                     inline: false
                 });
             }
@@ -126,3 +138,24 @@ export default {
         await interaction.editReply({ embeds: [requestEmbed] });
     },
 };
+
+function getUserCount(songData, userId) {
+    const requestsKey = "requests";
+
+    if (!songData[requestsKey]) {
+        return 0;
+    }
+
+    const count = songData[requestsKey][userId];
+    return count || 0;
+}
+
+function setUserCount(songData, userId, count) {
+    const requestsKey = "requests";
+
+    if (!songData[requestsKey]) {
+        songData[requestsKey] = {};
+    }
+
+    songData[requestsKey][userId] = count;
+}
