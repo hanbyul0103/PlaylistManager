@@ -77,7 +77,6 @@ export default {
             title: title
         };
 
-
         if (!songData[day]) {
             songData[day] = {};
         }
@@ -85,28 +84,30 @@ export default {
         const dayRequests = songData[day];
         const currentSongCount = Object.keys(dayRequests).length;
 
-        // if() // TODO: 본인이 주에 2개 했는지 확인
+        const requestsKey = "requests";
+        const maxSongsForWeek = process.env.MAX_REQUESTS_PER_USER;
+        const maxSongs = process.env.MAX_SONGS;
 
-        if (currentSongCount >= process.env.MAX_SONGS) {
-            await interaction.editReply({ content: `${day} 플레이리스트는 이미 꽉 차서 신청할 수 없습니다.` });
+        if (getUserCount(songData, requestsKey, userId) >= maxSongsForWeek) {
+            await interaction.editReply({ content: `한 주에 최대 ${maxSongsForWeek}곡까지 신청할 수 있습니다. 이미 ${maxSongsForWeek}곡을 신청했습니다.` });
 
             return;
         }
 
-        if (getUserCount(songData, userId) >= process.env.MAX_REQUESTS_PER_USER) {
-            await interaction.editReply({ content: `한 주에 최대 ${MAX_REQUESTS_PER_USER}곡까지 신청할 수 있습니다. 이미 ${MAX_REQUESTS_PER_USER}곡을 신청했습니다.` });
+        if (currentSongCount >= maxSongs) {
+            await interaction.editReply({ content: `${day} 플레이리스트는 이미 꽉 차서 신청할 수 없습니다.` });
 
             return;
         }
 
         songData[day][userId] = newSongData;
 
-        setUserCount(songData, userId, getUserCount(songData, userId) + 1);
+        setUserCount(songData, requestsKey, userId, getUserCount(songData, requestsKey, userId) + 1);
 
         jsonHelper.writeFile(filePath, songData);
 
         let songList = [];
-        songData = jsonHelper.readFile(filePath); // 저장 후 다시 가져오는 부분 (최신으로)
+        songData = jsonHelper.readFile(filePath); // TODO: 빼고 다시 해봐. 필요 없을 수도 있음
 
         for (const [dayKey, userRequests] of Object.entries(songData)) {
             if (dayKey === "requests" || dayKey === "unionRole") continue;
@@ -139,20 +140,20 @@ export default {
     },
 };
 
-function getUserCount(songData, userId) {
-    const requestsKey = "requests";
-
+function getUserCount(songData, requestsKey, userId) {
     if (!songData[requestsKey]) {
         return 0;
     }
+
+    if (!songData[requestsKey][userId]) { // 없으면 넣고
+        songData[requestsKey][userId] = 1;
+    };
 
     const count = songData[requestsKey][userId];
     return count || 0;
 }
 
-function setUserCount(songData, userId, count) {
-    const requestsKey = "requests";
-
+function setUserCount(songData, requestsKey, userId, count) {
     if (!songData[requestsKey]) {
         songData[requestsKey] = {};
     }
