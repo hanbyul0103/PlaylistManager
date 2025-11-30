@@ -41,109 +41,111 @@ export default {
     callback: async (client, interaction) => {
         await interaction.deferReply({ ephemeral: false });
 
-        const all = interaction.options?.getBoolean('all');
+        // const all = interaction.options?.getBoolean('all');
 
-        if (all) {
-            const member = interaction.member;
+        // if (all) {
+        //     const member = interaction.member;
 
-            if (!member.roles.cache()) { // TODO: 될지 모르겠다. 이거 다시 확인
-                
-            }
+        //     if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) { // TODO: 관리자 권한 > 지정한 역할이 있는지 확인
+        //         await interaction.editReply({ content: `해당 명령어는 특정 역할이 있는 유저만 실행할 수 있습니다.` });
 
-            if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) { // TODO: 관리자 권한 > 지정한 역할이 있는지 확인
-                await interaction.editReply({ content: `해당 명령어는 특정 역할이 있는 유저만 실행할 수 있습니다.` });
+        //         return;
+        //     }
 
-                return;
-            }
-        }
+        //     // if (!member.roles.cache()) { // TODO: 이게 지정한 역할이 있는지 확인하는 파트임
 
-        let artist;
-        let title;
-        const day = interaction.options?.getString('day');
-
-        const userId = interaction.user.id;
-
-        //#region 서버 json 파일 불러오는 파트
-
-        const guildId = interaction.guild.id;
-        const dataPath = path.join(__dirname, `../data/${guildId}`);
-
-        if (!jsonHelper.isFileExist(dataPath)) {
-            await interaction.editReply({ content: `\`/init-server\` 명령어를 실행해 서버 정보를 DB에 등록하세요.` });
-
-            return;
-        };
-
-        const filePath = path.join(dataPath, `requests_current.json`);
-        const serverDataPath = path.join(dataPath, `serverData.json`);
-        // const randomSong = randomSongUtils.getRandomSong(serverDataPath); // TODO: api 사용 생각하기
-
-        //#endregion
-
-        let songData = {};
-
-        if (jsonHelper.isFileExist(filePath)) {
-            songData = jsonHelper.readFile(filePath);
-        }
-
-        // if (randomSong.result) {
-        //     artist = randomSong.data.artist;
-        //     title = randomSong.data.title;
-        // } else {
-        //     await interaction.editReply({ content: `데이터 파일이 세팅되지 않았습니다.` }); // TODO: 데이터 파일 강제 생성 기능 만들기
+        //     // }
         // }
 
-        const newSongData = {
-            artist: artist,
-            title: title
-        };
+        // let artist;
+        // let title;
+        // const day = interaction.options?.getString('day');
+
+        // const userId = interaction.user.id;
+
+        // //#region 서버 json 파일 불러오는 파트
+
+        // const guildId = interaction.guild.id;
+        // const dataPath = path.join(__dirname, `../data/${guildId}`);
+
+        // if (!jsonHelper.isFileExist(dataPath)) {
+        //     await interaction.editReply({ content: `\`/init-server\` 명령어를 실행해 서버 정보를 DB에 등록하세요.` });
+
+        //     return;
+        // };
+
+        // const filePath = path.join(dataPath, `requests_current.json`);
+        // const serverDataPath = path.join(dataPath, `serverData.json`);
+        // // const randomSong = randomSongUtils.getRandomSong(serverDataPath); // TODO: api 사용 생각하기
+
+        // //#endregion
+
+        // let songData = {};
+
+        // if (jsonHelper.isFileExist(filePath)) {
+        //     songData = jsonHelper.readFile(filePath);
+        // }
+
+        // // if (randomSong.result) {
+        // //     artist = randomSong.data.artist;
+        // //     title = randomSong.data.title;
+        // // } else {
+        // //     await interaction.editReply({ content: `데이터 파일이 세팅되지 않았습니다.` }); // TODO: 데이터 파일 강제 생성 기능 만들기
+        // // }
+
+        // const newSongData = {
+        //     artist: artist,
+        //     title: title
+        // };
 
 
-        if (!songData[day]) {
-            songData[day] = {};
-        }
+        // if (!songData[day]) {
+        //     songData[day] = {};
+        // }
 
-        const dayRequests = songData[day];
-        const currentSongCount = Object.keys(dayRequests).length;
+        // const dayRequests = songData[day];
+        // const currentSongCount = Object.keys(dayRequests).length;
 
-        if (currentSongCount >= process.env.MAX_SONGS) {
-            await interaction.editReply({ content: `${day} 플레이리스트는 이미 꽉 차서 신청할 수 없습니다.` });
+        // if (currentSongCount >= process.env.MAX_SONGS) {
+        //     await interaction.editReply({ content: `${day} 플레이리스트는 이미 꽉 차서 신청할 수 없습니다.` });
 
-            return;
-        }
+        //     return;
+        // }
 
-        songData[day][userId] = newSongData;
+        // songData[day][userId] = newSongData;
 
-        jsonHelper.writeFile(filePath, songData);
+        // jsonHelper.writeFile(filePath, songData);
 
-        let songList = [];
-        songData = jsonHelper.readFile(filePath); // 저장 후 다시 가져오는 부분 (최신으로)
+        // let songList = [];
+        // songData = jsonHelper.readFile(filePath); // 저장 후 다시 가져오는 부분 (최신으로)
 
-        for (const [dayKey, userRequests] of Object.entries(songData)) {
-            if (dayKey === day) {
-                let songs = '';
+        // for (const [dayKey, userRequests] of Object.entries(songData)) {
+        //     if (dayKey === day) {
+        //         let songs = '';
 
-                for (const [userId, song] of Object.entries(userRequests)) {
-                    songs += `${song.artist} - ${song.title}\n`;
-                }
+        //         for (const [userId, song] of Object.entries(userRequests)) {
+        //             songs += `${song.artist} - ${song.title}\n`;
+        //         }
 
-                songList.push({
-                    name: `${dayKey}`,
-                    value: songs,
-                    inline: false
-                });
-            }
-        }
+        //         songList.push({
+        //             name: `${dayKey}`,
+        //             value: songs,
+        //             inline: false
+        //         });
+        //     }
+        // }
 
-        const requestEmbed = embedGenerator.createEmbed(
-            {
-                title: `${day} 노래 신청 목록`,
-                description: `규칙에 어긋난 신청곡은 예고 없이 삭제될 수 있습니다.`,
-                fields: songList,
-                timestamp: true
-            }
-        )
+        // const requestEmbed = embedGenerator.createEmbed(
+        //     {
+        //         title: `${day} 노래 신청 목록`,
+        //         description: `규칙에 어긋난 신청곡은 예고 없이 삭제될 수 있습니다.`,
+        //         fields: songList,
+        //         timestamp: true
+        //     }
+        // )
 
-        await interaction.editReply({ embeds: [requestEmbed] });
+        // await interaction.editReply({ embeds: [requestEmbed] });
+
+        await interaction.editReply({ content: `준비중입니다.` });
     },
 };
