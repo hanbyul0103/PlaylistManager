@@ -45,7 +45,7 @@ export default {
 
         if (user) {
             const member = interaction.member;
-            
+
             if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) { // TODO: 관리자 권한 > 지정한 역할이 있는지 확인
                 await interaction.editReply({ content: `해당 명령어는 특정 역할이 있는 유저만 실행할 수 있습니다.` });
 
@@ -90,6 +90,8 @@ export default {
         songData = jsonHelper.readFile(filePath); // 저장 후 다시 가져오는 부분 (최신으로)
 
         for (const [dayKey, userRequests] of Object.entries(songData)) {
+            if (dayKey === "requests" || dayKey === "unionRole") continue;
+
             if (dayKey === day) {
                 let songs = '';
 

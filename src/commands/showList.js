@@ -67,6 +67,8 @@ export default {
         let songList = [];
 
         for (const [dayKey, userRequests] of Object.entries(songData)) {
+            if (dayKey === "requests" || dayKey === "unionRole") continue;
+
             if (day && dayKey !== day) continue;
 
             const currentSongCount = Object.keys(userRequests || {}).length;
