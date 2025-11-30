@@ -89,6 +89,8 @@ export default {
             description = `해당 유저의 신청 목록이 없어 제거되지 않았습니다.`;
         }
 
+        setUserCount(songData, requestsKey, userId, getUserCount(songData, requestsKey, userId) - 1);
+
         jsonHelper.writeFile(filePath, songData);
 
         let songList = [];
@@ -124,3 +126,25 @@ export default {
         await interaction.editReply({ embeds: [removeEmbed] });
     },
 };
+
+function getUserCount(songData, requestsKey, userId) {
+    if (!songData[requestsKey]) {
+        return 0;
+    }
+
+    if (!songData[requestsKey][userId]) { // 없으면 넣고
+        songData[requestsKey][userId] = 1;
+    };
+
+    const count = songData[requestsKey][userId];
+    return count || 0;
+}
+
+function setUserCount(songData, requestsKey, userId, count) {
+    if (!songData[requestsKey]) {
+        songData[requestsKey] = {};
+    }
+
+    count = Math.max(count - 1, 0);
+    songData[requestsKey][userId] = count;
+}
