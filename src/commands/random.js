@@ -21,7 +21,7 @@ export default {
             name: 'day',
             description: '확인할 요일',
             type: ApplicationCommandOptionType.String,
-            required: false,
+            required: true,
             choices: [
                 { name: `월요일`, value: `월요일` },
                 { name: `화요일`, value: `화요일` },
@@ -113,3 +113,5 @@ function shuffle(array) {
         [array[i], array[j]] = [array[j], array[i]];
     }
 }
+
+// TODO: 랜덤 돌리는 거는 노래 신청한 유저가 하루에 한 번씩 가능한 커맨드임
