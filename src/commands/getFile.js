@@ -36,7 +36,7 @@ export default {
         await interaction.deferReply({ ephemeral: false });
 
         const member = interaction.member;
-        
+
         if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) { // TODO: 관리자 권한 > 지정한 역할이 있는지 확인
             await interaction.editReply({ content: `해당 명령어는 특정 역할이 있는 유저만 실행할 수 있습니다.` });
 
@@ -76,6 +76,8 @@ export default {
         }
 
         for (const [dayKey, userRequests] of Object.entries(songData)) {
+            if (dayKey === "requests" || dayKey === "unionRole") continue;
+
             if (day && dayKey !== day) continue;
 
             fileContent += `${dayKey}\n`;
