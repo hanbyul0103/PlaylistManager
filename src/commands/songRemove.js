@@ -84,12 +84,13 @@ export default {
 
         if (dayRequests && dayRequests[userId]) {
             delete songData[day][userId];
+
+            setUserCount(songData, requestsKey, userId, getUserCount(songData, requestsKey, userId) - 1);
+
             description = `성공적으로 삭제되었습니다.`;
         } else {
             description = `해당 유저의 신청 목록이 없어 제거되지 않았습니다.`;
         }
-
-        setUserCount(songData, requestsKey, userId, getUserCount(songData, requestsKey, userId) - 1);
 
         jsonHelper.writeFile(filePath, songData);
 
