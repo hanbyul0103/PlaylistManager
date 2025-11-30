@@ -10,7 +10,6 @@ import { fileURLToPath } from 'url';
 // 외부 함수
 import * as jsonHelper from "../utils/jsonHelper.js";
 import * as embedGenerator from "../utils/embedGenerator.js";
-import * as randomSongUtils from "../utils/randomSongUtils.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -46,6 +45,10 @@ export default {
 
         if (all) {
             const member = interaction.member;
+
+            if (!member.roles.cache()) { // TODO: 될지 모르겠다. 이거 다시 확인
+                
+            }
 
             if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) { // TODO: 관리자 권한 > 지정한 역할이 있는지 확인
                 await interaction.editReply({ content: `해당 명령어는 특정 역할이 있는 유저만 실행할 수 있습니다.` });
