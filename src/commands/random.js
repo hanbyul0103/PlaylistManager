@@ -107,13 +107,9 @@ export default {
 function shuffle(array) {
     if (array.length === 0) console.log("길이가 0이에요.");
 
-    for (let i = 0; i < 50; i++) {
-        let first = Math.floor(Math.random() * 10);
-        let second = Math.floor(Math.random() * 10);
-        let temp = 0;
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
 
-        temp = array[first];
-        array[first] = array[second];
-        array[second] = temp;
+        [array[i], array[j]] = [array[j], array[i]];
     }
 }
