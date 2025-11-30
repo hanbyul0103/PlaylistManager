@@ -146,7 +146,7 @@ function getUserCount(songData, requestsKey, userId) {
     }
 
     if (!songData[requestsKey][userId]) { // 없으면 넣고
-        songData[requestsKey][userId] = 1;
+        songData[requestsKey][userId] = 0;
     };
 
     const count = songData[requestsKey][userId];
