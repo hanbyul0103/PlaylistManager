@@ -80,8 +80,13 @@ export default {
 
         const dayRequests = songData[day];
 
+        let description = '';
+
         if (dayRequests && dayRequests[userId]) {
             delete songData[day][userId];
+            description = `성공적으로 삭제되었습니다.`;
+        } else {
+            description = `해당 유저의 신청 목록이 없어 제거되지 않았습니다.`;
         }
 
         jsonHelper.writeFile(filePath, songData);
@@ -105,14 +110,6 @@ export default {
                     inline: false
                 });
             }
-        }
-
-        let description = '';
-
-        if (!dayRequests[userId]) {
-            description = `해당 유저의 신청 목록이 없어 제거되지 않았습니다.`;
-        } else {
-            description = `규칙에 어긋난 신청곡은 예고 없이 삭제될 수 있습니다.`
         }
 
         const removeEmbed = embedGenerator.createEmbed(
