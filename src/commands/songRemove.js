@@ -81,7 +81,7 @@ export default {
         const dayRequests = songData[day];
 
         let description = '';
-        const requestsKey = "requestsKey";
+        const requestsKey = "requests";
 
         if (dayRequests && dayRequests[userId]) {
             delete songData[day][userId];
