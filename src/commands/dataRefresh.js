@@ -1,5 +1,4 @@
 import {
-    ApplicationCommandOptionType,
     PermissionsBitField
 } from 'discord.js';
 
@@ -50,11 +49,23 @@ export default {
         }
 
         let userSongCount = {};
+        let dayCount = {};
+
+        let weekFields = [];
 
         for (const [dayKey, userRequests] of Object.entries(songData)) {
             if (dayKey === "requests" || dayKey === "unionRole") continue;
 
             const userIds = Object.keys(userRequests);
+            const songsInDay = userIds.length;
+
+            dayCount[dayKey] = songsInDay;
+
+            weekFields.push({
+                name: `${dayKey}`,
+                value: `${dayCount[dayKey]}곡`,
+                inline: true
+            })
 
             for (const userId of userIds) {
                 userSongCount[userId] = (userSongCount[userId] || 0) + 1;
@@ -63,9 +74,14 @@ export default {
 
         songData.requests = userSongCount;
 
-        // 5. 업데이트된 데이터를 파일에 저장합니다.
         jsonHelper.writeFile(filePath, songData);
 
-        await interaction.editReply({ content: `데이터 검사가 완료되었습니다.` });
+        const weeklyData = embedGenerator.createEmbed({
+            title: `데이터 검사가 완료되었습니다.`,
+            fields: weekFields,
+            timestamp: true
+        });
+
+        await interaction.editReply({ content: `데이터 검사가 완료되었습니다.\n결과 보고서`, embeds: [weeklyData] });
     },
 };
