@@ -15,7 +15,7 @@ const __dirname = path.dirname(__filename);
 
 export default {
     name: 'random',
-    description: '하루에 한 번 리스트를 섞을 수 있습니다.',
+    description: '리스트를 섞을 수 있습니다.',
     options: [
         {
             name: 'day',
@@ -113,5 +113,3 @@ function shuffle(array) {
         [array[i], array[j]] = [array[j], array[i]];
     }
 }
-
-// TODO: 랜덤 돌리는 거는 노래 신청한 유저가 하루에 한 번씩 가능한 커맨드임
