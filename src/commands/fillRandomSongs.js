@@ -1,11 +1,11 @@
 import {
     ApplicationCommandOptionType,
-    PermissionsBitField
 } from 'discord.js';
 
 // 라이브러리
 import path from 'path';
 import { fileURLToPath } from 'url';
+import axios from "axios";
 
 // 외부 함수
 import * as jsonHelper from "../utils/jsonHelper.js";
@@ -16,7 +16,7 @@ const __dirname = path.dirname(__filename);
 
 export default {
     name: 'request-random',
-    description: '지금까지 쌓인 데이터를 기반으로 노래를 랜덤 신청합니다.',
+    description: '노래를 랜덤 신청합니다. (FLO 기반)',
     options: [
         {
             name: 'day',
@@ -32,6 +32,25 @@ export default {
             ]
         },
         {
+            name: 'genre',
+            description: '장르',
+            type: ApplicationCommandOptionType.String,
+            required: true,
+            choices: [
+                { name: `FLO 차트`, value: `50001` },
+                { name: `국내 발라드`, value: `3550` },
+                { name: `해외 팝`, value: `3559` },
+                { name: `J-POP`, value: `3571` },
+                { name: `국내 댄스/일렉`, value: `3551` },
+                { name: `국내 알앤비`, value: `3553` },
+                { name: `국내 힙합`, value: `3552` },
+                { name: `트로트`, value: `3554` },
+                { name: `해외 알앤비`, value: `3561` },
+                { name: `해외 힙합`, value: `3560` },
+                { name: `OST/BGM`, value: `3565` },
+            ]
+        },
+        {
             name: 'all',
             description: '남은 수를 모두 랜덤으로 채울 것인지',
             type: ApplicationCommandOptionType.Boolean,
@@ -41,26 +60,9 @@ export default {
     callback: async (client, interaction) => {
         await interaction.deferReply({ ephemeral: false });
 
-        // const all = interaction.options?.getBoolean('all');
-
-        // if (all) {
-        //     const member = interaction.member;
-
-        //     if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) { // TODO: 관리자 권한 > 지정한 역할이 있는지 확인
-        //         await interaction.editReply({ content: `해당 명령어는 특정 역할이 있는 유저만 실행할 수 있습니다.` });
-
-        //         return;
-        //     }
-
-        //     // if (!member.roles.cache()) { // TODO: 이게 지정한 역할이 있는지 확인하는 파트임
-
-        //     // }
-        // }
-
-        // let artist;
-        // let title;
-        // const day = interaction.options?.getString('day');
-
+        const day = interaction.options?.getString('day');
+        const genre = interaction.options?.getString('genre');
+        const all = interaction.options?.getBoolean('all');
         // const userId = interaction.user.id;
 
         // //#region 서버 json 파일 불러오는 파트
@@ -75,8 +77,6 @@ export default {
         // };
 
         // const filePath = path.join(dataPath, `requests_current.json`);
-        // const serverDataPath = path.join(dataPath, `serverData.json`);
-        // // const randomSong = randomSongUtils.getRandomSong(serverDataPath); // TODO: api 사용 생각하기
 
         // //#endregion
 
@@ -86,18 +86,13 @@ export default {
         //     songData = jsonHelper.readFile(filePath);
         // }
 
-        // // if (randomSong.result) {
-        // //     artist = randomSong.data.artist;
-        // //     title = randomSong.data.title;
-        // // } else {
-        // //     await interaction.editReply({ content: `데이터 파일이 세팅되지 않았습니다.` }); // TODO: 데이터 파일 강제 생성 기능 만들기
-        // // }
+        // // const artist = // TODO: 이쪽 부분에서 가져오기
+        // // const title = 
 
         // const newSongData = {
         //     artist: artist,
         //     title: title
         // };
-
 
         // if (!songData[day]) {
         //     songData[day] = {};
@@ -106,7 +101,17 @@ export default {
         // const dayRequests = songData[day];
         // const currentSongCount = Object.keys(dayRequests).length;
 
-        // if (currentSongCount >= process.env.MAX_SONGS) {
+        // const requestsKey = "requests";
+        // const maxSongsForWeek = process.env.MAX_REQUESTS_PER_USER;
+        // const maxSongs = process.env.MAX_SONGS;
+
+        // if (getUserCount(songData, requestsKey, userId) >= maxSongsForWeek) {
+        //     await interaction.editReply({ content: `한 주에 최대 ${maxSongsForWeek}곡까지 신청할 수 있습니다. 이미 ${maxSongsForWeek}곡을 신청했습니다.` });
+
+        //     return;
+        // }
+
+        // if (currentSongCount >= maxSongs) {
         //     await interaction.editReply({ content: `${day} 플레이리스트는 이미 꽉 차서 신청할 수 없습니다.` });
 
         //     return;
@@ -114,12 +119,16 @@ export default {
 
         // songData[day][userId] = newSongData;
 
+        // setUserCount(songData, requestsKey, userId, getUserCount(songData, requestsKey, userId) + 1);
+
         // jsonHelper.writeFile(filePath, songData);
 
         // let songList = [];
-        // songData = jsonHelper.readFile(filePath); // 저장 후 다시 가져오는 부분 (최신으로)
+        // songData = jsonHelper.readFile(filePath); // TODO: 빼고 다시 해봐. 필요 없을 수도 있음
 
         // for (const [dayKey, userRequests] of Object.entries(songData)) {
+        //     if (dayKey === "requests" || dayKey === "unionRole") continue;
+
         //     if (dayKey === day) {
         //         let songs = '';
 
@@ -129,7 +138,7 @@ export default {
 
         //         songList.push({
         //             name: `${dayKey}`,
-        //             value: songs,
+        //             value: songs || `등록된 노래가 없습니다.`,
         //             inline: false
         //         });
         //     }
@@ -146,6 +155,83 @@ export default {
 
         // await interaction.editReply({ embeds: [requestEmbed] });
 
-        await interaction.editReply({ content: `준비중입니다.` });
+        let artist = '';
+        let title = '';
+        let replyContent = '';
+
+        // 1. FLO API 요청
+        const floResult = await getFloTrackInfo(genre); // 장르 ID 전달
+
+        // 2. 응답 데이터 처리
+        if (typeof floResult.data === 'string') {
+            // 에러 메시지인 경우
+            replyContent = `FLO API 요청 중 오류가 발생했습니다: \`${floResult.data}\``;
+        } else if (Array.isArray(floResult.data) && floResult.data.length > 0) {
+            // 성공적으로 곡 정보를 가져온 경우
+            const songs = floResult.data;
+
+            // --- 🎯 랜덤 곡 선택 및 신청 변수 할당 ---
+            const randomIndex = Math.floor(Math.random() * songs.length);
+            const randomSong = songs[randomIndex];
+
+            // 신청 로직에 사용할 artist와 title 변수에 할당
+            artist = randomSong.representationArtist?.name || '알 수 없는 아티스트';
+            title = randomSong.name;
+            // ----------------------------------------
+
+            // --- 📚 응답용 곡 목록 포맷팅 (선택된 곡을 강조) ---
+            const formattedSongs = songs.slice(0, 10).map((song, index) => { // 상위 10개만 보여주기
+                const songTitle = song.name;
+                const songArtist = song.representationArtist?.name || '알 수 없는 아티스트';
+
+                // 랜덤으로 선택된 곡이면 강조 표시
+                if (song.id === randomSong.id) {
+                    return `**✅ ${index + 1}. ${songTitle} - ${songArtist} (선택됨)**`;
+                }
+
+                return `${index + 1}. **${songTitle}** - ${songArtist}`;
+            }).join('\n');
+
+            replyContent = `🎉 **${day}**에 추천할 **FLO 랜덤 ${genre} 곡 (총 ${songs.length}곡 중 1곡 선택)**\n\n` +
+                `**선택된 곡:** \`${artist} - ${title}\`\n\n` +
+                `**[차트 상위 10곡 예시]**\n${formattedSongs}`;
+
+            // TODO: 여기서 artist와 title 변수에 할당된 값을 사용하여 
+            // 위에 주석처리된 **신청 로직을 활성화**해야 합니다.
+
+            // 예시: 
+            // const newSongData = { artist: artist, title: title };
+            // songData[day][userId] = newSongData;
+            // ... (파일 저장 로직)
+
+        } else {
+            // 데이터가 비어있는 경우
+            replyContent = `FLO API에서 곡 정보를 가져오는 데 실패했거나, ${genre} 차트 목록이 비어있습니다.`;
+        }
+
+        await interaction.editReply({ content: replyContent });
+
+        await interaction.editReply({ content: replyContent });
     },
 };
+
+async function getFloTrackInfo(genre) {
+    const url = `https://www.music-flo.com/api/display/v1/browser/chart/${genre}/track/list?size=100`;
+    console.log(url);
+
+    try {
+        const response = await axios.get(url, {
+            params: {
+                page: 1,
+                size: 10,
+            },
+        });
+
+        const trackList = response.data?.data?.trackList || [];
+
+        return { data: trackList, chartId: genre };
+
+    } catch (error) {
+        return { data: error.message };
+    }
+}
