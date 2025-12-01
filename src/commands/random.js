@@ -19,7 +19,7 @@ export default {
     options: [
         {
             name: 'day',
-            description: '확인할 요일',
+            description: '섞을 요일',
             type: ApplicationCommandOptionType.String,
             required: true,
             choices: [
