@@ -2,17 +2,6 @@ import {
     ApplicationCommandOptionType,
 } from 'discord.js';
 
-// 라이브러리
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-// 외부 함수
-import * as jsonHelper from "../utils/jsonHelper.js";
-import * as embedGenerator from "../utils/embedGenerator.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 export default {
     name: 'feedback',
     description: '자유롭게 의견을 남겨주세요.',

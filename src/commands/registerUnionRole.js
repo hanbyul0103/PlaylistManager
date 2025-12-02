@@ -25,7 +25,7 @@ export default {
         },
     ],
     callback: async (client, interaction) => {
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply({ ephemeral: false });
 
         const role = interaction.options?.getRole("role");
 
