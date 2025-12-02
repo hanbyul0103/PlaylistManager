@@ -17,7 +17,7 @@ export const loadEvents = (client) => {
 
     for (const file of eventFiles) {
         const filePath = path.join(eventsPath, file);
-        const fileUrl = pathToFileURL(filePath).href; // ← pathToFileURL 사용
+        const fileUrl = pathToFileURL(filePath).href;
         import(fileUrl).then(({ default: event }) => {
             if (event.once) {
                 client.once(event.name, (...args) => event.execute(...args, client));
