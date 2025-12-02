@@ -37,7 +37,6 @@ export default {
             type: ApplicationCommandOptionType.String,
             required: true,
             choices: [
-                { name: `FLO 차트`, value: `50001` },
                 { name: `국내 발라드`, value: `3550` },
                 { name: `해외 팝`, value: `3559` },
                 { name: `J-POP`, value: `3571` },
@@ -159,57 +158,24 @@ export default {
         let title = '';
         let replyContent = '';
 
-        // 1. FLO API 요청
-        const floResult = await getFloTrackInfo(genre); // 장르 ID 전달
+        const floResult = await getFloTrackInfo(genre);
 
-        // 2. 응답 데이터 처리
         if (typeof floResult.data === 'string') {
-            // 에러 메시지인 경우
-            replyContent = `FLO API 요청 중 오류가 발생했습니다: \`${floResult.data}\``;
+            console.log(`FLO API 요청 중 오류가 발생했습니다: ${floResult.data}`);
         } else if (Array.isArray(floResult.data) && floResult.data.length > 0) {
-            // 성공적으로 곡 정보를 가져온 경우
             const songs = floResult.data;
 
-            // --- 🎯 랜덤 곡 선택 및 신청 변수 할당 ---
-            const randomIndex = Math.floor(Math.random() * songs.length);
-            const randomSong = songs[randomIndex];
+            for (let i = 0; i < songs.length; i++) {
+                const current = songs[i];
+                replyContent += `${current.representationArtist?.name} - ${current.name}\n`;
+            }
 
-            // 신청 로직에 사용할 artist와 title 변수에 할당
-            artist = randomSong.representationArtist?.name || '알 수 없는 아티스트';
-            title = randomSong.name;
-            // ----------------------------------------
+            // const randomIndex = Math.floor(Math.random() * songs.length);
+            // const randomSong = songs[randomIndex];
 
-            // --- 📚 응답용 곡 목록 포맷팅 (선택된 곡을 강조) ---
-            const formattedSongs = songs.slice(0, 10).map((song, index) => { // 상위 10개만 보여주기
-                const songTitle = song.name;
-                const songArtist = song.representationArtist?.name || '알 수 없는 아티스트';
-
-                // 랜덤으로 선택된 곡이면 강조 표시
-                if (song.id === randomSong.id) {
-                    return `**✅ ${index + 1}. ${songTitle} - ${songArtist} (선택됨)**`;
-                }
-
-                return `${index + 1}. **${songTitle}** - ${songArtist}`;
-            }).join('\n');
-
-            replyContent = `🎉 **${day}**에 추천할 **FLO 랜덤 ${genre} 곡 (총 ${songs.length}곡 중 1곡 선택)**\n\n` +
-                `**선택된 곡:** \`${artist} - ${title}\`\n\n` +
-                `**[차트 상위 10곡 예시]**\n${formattedSongs}`;
-
-            // TODO: 여기서 artist와 title 변수에 할당된 값을 사용하여 
-            // 위에 주석처리된 **신청 로직을 활성화**해야 합니다.
-
-            // 예시: 
-            // const newSongData = { artist: artist, title: title };
-            // songData[day][userId] = newSongData;
-            // ... (파일 저장 로직)
-
-        } else {
-            // 데이터가 비어있는 경우
-            replyContent = `FLO API에서 곡 정보를 가져오는 데 실패했거나, ${genre} 차트 목록이 비어있습니다.`;
+            // artist = randomSong.representationArtist?.name || '알 수 없는 아티스트';
+            // title = randomSong.name;
         }
-
-        await interaction.editReply({ content: replyContent });
 
         await interaction.editReply({ content: replyContent });
     },
