@@ -14,7 +14,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default {
-    name: 'data-refresh',
+    name: 'show-status',
     description: '데이터를 검사합니다.',
     callback: async (client, interaction) => {
         await interaction.deferReply({ ephemeral: false });
