@@ -1,11 +1,11 @@
 import {
     ApplicationCommandOptionType,
+    PermissionsBitField,
 } from 'discord.js';
 
 // 라이브러리
 import path from 'path';
 import { fileURLToPath } from 'url';
-import axios from "axios";
 
 // 외부 함수
 import * as jsonHelper from "../utils/jsonHelper.js";
@@ -61,8 +61,20 @@ export default {
 
         const day = interaction.options?.getString('day');
         const genre = interaction.options?.getString('genre');
-        const all = interaction.options?.getBoolean('all');
-        const userId = interaction.user.id;
+        const all = interaction.options?.getBoolean('all') || false;
+        let userId = interaction.user.id;
+
+        if (all) {
+            const member = interaction.member;
+
+            if (!member.permissions.has(PermissionsBitField.Flags.Administrator)) { // TODO: 관리자 권한 > 지정한 역할이 있는지 확인
+                await interaction.editReply({ content: `해당 명령어는 특정 역할이 있는 유저만 실행할 수 있습니다.` });
+
+                return;
+            }
+
+            userId = client.user.id;
+        }
 
         //#region 서버 json 파일 불러오는 파트
 
@@ -86,53 +98,80 @@ export default {
             songData = jsonHelper.readFile(filePath);
         }
 
-        const floData = jsonHelper.readFile(songDataPath);
-        const currentGenre = floData[genre];
-
-        const randomIndex = Math.floor(Math.random() * currentGenre.length);
-        const randomSong = currentGenre[randomIndex];
-
-        const artist = randomSong.artist;
-        const title = randomSong.title
-
-        const newSongData = {
-            artist: artist,
-            title: title
-        };
-
         if (!songData[day]) {
             songData[day] = {};
         }
 
-        const dayRequests = songData[day];
-        const currentSongCount = Object.keys(dayRequests).length;
+        const floData = jsonHelper.readFile(songDataPath);
+        const currentGenre = floData[genre];
 
         const requestsKey = "requests";
-        const maxSongsForWeek = process.env.MAX_REQUESTS_PER_USER;
-        const maxSongs = process.env.MAX_SONGS;
+        const maxSongsForWeek = parseInt(process.env.MAX_REQUESTS_PER_USER);
+        const maxSongs = parseInt(process.env.MAX_SONGS);
+        const dayRequests = songData[day];
+        let currentSongCount = Object.keys(dayRequests).length;
 
-        if (getUserCount(songData, requestsKey, userId) >= maxSongsForWeek) {
-            await interaction.editReply({ content: `한 주에 최대 ${maxSongsForWeek}곡까지 신청할 수 있습니다. 이미 ${maxSongsForWeek}곡을 신청했습니다.` });
+        if (!all) {
+            if (getUserCount(songData, requestsKey, userId) >= maxSongsForWeek) {
+                await interaction.editReply({ content: `한 주에 최대 ${maxSongsForWeek}곡까지 신청할 수 있습니다. 이미 ${maxSongsForWeek}곡을 신청했습니다.` });
+                return;
+            }
 
-            return;
+            if (currentSongCount >= maxSongs) {
+                await interaction.editReply({ content: `${day} 플레이리스트는 이미 꽉 차서 신청할 수 없습니다.` });
+                return;
+            }
+
+            const randomIndex = Math.floor(Math.random() * currentGenre.length);
+            const randomSong = currentGenre[randomIndex];
+
+            const newSongData = {
+                artist: randomSong.artist,
+                title: randomSong.title
+            };
+
+            songData[day][userId] = newSongData;
+
+            setUserCount(songData, requestsKey, userId, getUserCount(songData, requestsKey, userId) + 1);
+
+            currentSongCount++;
+        } else {
+            const songsToFill = maxSongs - currentSongCount;
+            let songsAdded = 0;
+
+            if (songsToFill <= 0) {
+                await interaction.editReply({ content: `${day} 플레이리스트는 이미 꽉 차 있습니다. (최대 ${maxSongs}곡)` });
+                return;
+            }
+
+            for (let i = 0; i < songsToFill; i++) {
+                // 랜덤 노래 선택
+                const randomIndex = Math.floor(Math.random() * currentGenre.length);
+                const randomSong = currentGenre[randomIndex];
+
+                const newSongData = {
+                    artist: randomSong.artist,
+                    title: randomSong.title
+                };
+
+                let botSongKey = `${userId}_${currentSongCount + i}`;
+
+                songData[day][botSongKey] = newSongData;
+                songsAdded++;
+            }
+
+            currentSongCount += songsAdded; // 노래 수 증가
+
+            await interaction.followUp({ content: `${day} 플레이리스트에 ${songsAdded}곡을 랜덤으로 채웠습니다.` });
         }
-
-        if (currentSongCount >= maxSongs) {
-            await interaction.editReply({ content: `${day} 플레이리스트는 이미 꽉 차서 신청할 수 없습니다.` });
-
-            return;
-        }
-
-        songData[day][userId] = newSongData;
-
-        setUserCount(songData, requestsKey, userId, getUserCount(songData, requestsKey, userId) + 1);
 
         jsonHelper.writeFile(filePath, songData);
 
         let songList = [];
-        songData = jsonHelper.readFile(filePath); // TODO: 빼고 다시 해봐. 필요 없을 수도 있음
 
-        for (const [dayKey, userRequests] of Object.entries(songData)) {
+        const updatedSongData = jsonHelper.readFile(filePath);
+
+        for (const [dayKey, userRequests] of Object.entries(updatedSongData)) {
             if (dayKey === "requests" || dayKey === "unionRole") continue;
 
             if (dayKey === day) {
@@ -159,6 +198,7 @@ export default {
             }
         )
 
+        // all=false일 때는 deferReply에 대한 editReply로, all=true일 때는 followUp 이후 editReply로 임베드 전송
         await interaction.editReply({ embeds: [requestEmbed] });
     },
 };
