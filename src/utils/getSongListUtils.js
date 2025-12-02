@@ -3,7 +3,6 @@ import axios from "axios";
 
 async function getFloTrackInfo(genre) {
     const url = `https://www.music-flo.com/api/display/v1/browser/chart/${genre}/track/list?size=100`;
-    console.log(url);
 
     try {
         const response = await axios.get(url, {
